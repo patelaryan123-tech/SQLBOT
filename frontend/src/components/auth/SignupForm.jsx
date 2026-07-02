@@ -65,7 +65,7 @@ function SuccessScreen({ email, onSwitchToLogin }) {
           </div>
           <div className="flex items-start gap-2">
             <span className="text-amber-400 mt-0.5 flex-shrink-0">②</span>
-            <span>Look for an email from <strong className="text-white font-mono text-[11px]">noreply@nexus-sql.firebaseapp.com</strong></span>
+            <span>Look for an email from <strong className="text-white font-mono text-[11px]">noreply@querymind-ai.firebaseapp.com</strong></span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-amber-400 mt-0.5 flex-shrink-0">③</span>

@@ -8,7 +8,8 @@ import {
   HiChevronLeft, 
   HiChevronRight, 
   HiEllipsisVertical,
-  HiArrowRightOnRectangle
+  HiArrowRightOnRectangle,
+  HiTrash
 } from 'react-icons/hi2';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -36,7 +37,7 @@ const SidebarNavItem = ({ item, isOpen }) => (
   </NavLink>
 );
 
-const Sidebar = ({ isOpen, setIsOpen, profile }) => {
+const Sidebar = ({ isOpen, setIsOpen, profile, chatSessions = [], activeSessionId, onSwitchChat, onDeleteChat }) => {
   const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -44,7 +45,7 @@ const Sidebar = ({ isOpen, setIsOpen, profile }) => {
 
   const currentProfile = profile || {
     name: 'Alex Mercer',
-    email: 'alex.mercer@nexus.io',
+    email: 'alex.mercer@querymind.ai',
     avatar: 'https://ui-avatars.com/api/?name=Alex+Mercer&background=a855f7&color=fff'
   };
 
@@ -91,7 +92,7 @@ const Sidebar = ({ isOpen, setIsOpen, profile }) => {
         </div>
         {isOpen && (
           <div className="flex flex-col min-w-0">
-            <span className="text-xl font-bold text-white tracking-tight">NexusSQL</span>
+            <span className="text-xl font-bold text-white tracking-tight">QueryMind AI</span>
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">AI Engine</span>
           </div>
         )}
@@ -100,6 +101,51 @@ const Sidebar = ({ isOpen, setIsOpen, profile }) => {
       <nav className="flex-1 py-6 overflow-y-auto custom-scrollbar flex flex-col gap-1">
         {navItems.map((item) => (
           <SidebarNavItem key={item.name} item={item} isOpen={isOpen} />
+        ))}
+
+        {/* Chat History Section */}
+        {isOpen && (
+          <div className="mt-6 mb-2 px-6">
+            <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Recent Chats</h3>
+          </div>
+        )}
+        {chatSessions.map((chat) => (
+          isOpen ? (
+            <div 
+              key={chat.id} 
+              onClick={() => onSwitchChat(chat.id)}
+              className={`group flex items-center justify-between mx-4 my-0.5 px-3 py-2 rounded-xl cursor-pointer transition-colors ${
+                activeSessionId === chat.id 
+                  ? 'bg-purple-600/[0.1] border border-purple-500/20' 
+                  : 'hover:bg-white/[0.04] border border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-3 overflow-hidden flex-1">
+                <HiChatBubbleLeftRight size={14} className={`flex-shrink-0 ${activeSessionId === chat.id ? 'text-purple-400' : 'text-slate-500'}`} />
+                <span className={`text-[13px] truncate ${activeSessionId === chat.id ? 'text-purple-300 font-semibold' : 'text-slate-400'}`}>
+                  {chat.title || 'New Chat'}
+                </span>
+              </div>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onDeleteChat(chat.id); }}
+                className="opacity-0 group-hover:opacity-100 hover:text-rose-400 text-slate-500 transition-opacity ml-2 flex-shrink-0"
+                title="Delete Chat"
+              >
+                <HiTrash size={14} />
+              </button>
+            </div>
+          ) : (
+            <div 
+              key={chat.id}
+              onClick={() => onSwitchChat(chat.id)}
+              className={`flex items-center justify-center mx-3 my-0.5 px-0 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                activeSessionId === chat.id ? 'bg-purple-600/[0.1] border border-purple-500/20' : 'hover:bg-white/[0.04] border border-transparent'
+              }`}
+              title={chat.title || 'New Chat'}
+            >
+              <HiChatBubbleLeftRight size={18} className={activeSessionId === chat.id ? 'text-purple-400' : 'text-slate-500'} />
+            </div>
+          )
         ))}
       </nav>
 

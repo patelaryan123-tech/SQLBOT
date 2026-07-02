@@ -19,6 +19,9 @@ export const checkErrors     = (sql)     => api.post('/chat/check-errors', { sql
 export const executeSQL      = (sql)     => api.post('/chat/execute', { sql });
 export const getChatHistory  = ()        => api.get('/chat/history');
 export const clearChatHistory = ()       => api.delete('/chat/history');
+export const uploadFile      = (formData) => api.post('/upload', formData, { 
+    headers: { 'Content-Type': 'multipart/form-data' } 
+});
 
 // Database
 export const getTables       = ()        => api.get('/db/tables');

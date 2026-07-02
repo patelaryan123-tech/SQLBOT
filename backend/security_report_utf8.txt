@@ -1,0 +1,81 @@
+﻿
+[SQLBOT] Security Validation Suite
+   Testing all 10 security layers...
+   Backend: http://localhost:5000
+
+============================================================
+  TEST #6 ΓÇö Helmet Header Hardening
+============================================================
+
+============================================================
+  TEST #8 ΓÇö CORS Validation Rules
+============================================================
+
+============================================================
+  TEST #7 ΓÇö JSON Body Size Limit (DoS Protection)
+============================================================
+
+============================================================
+  TEST #3 ΓÇö Dynamic Injection Sanitization
+============================================================
+
+============================================================
+  TEST #1 ΓÇö SQL Statement Interception (Destructive Commands)
+============================================================
+
+============================================================
+  TEST #2 ΓÇö Contextual Data Manipulation Boundaries
+============================================================
+
+============================================================
+  TEST #9 ΓÇö API Rate Limiting
+============================================================
+   Sending 55 rapid requests to trigger rate limit...
+
+============================================================
+  TEST #4 ΓÇö XSS Mitigation
+============================================================
+
+============================================================
+  TEST #5 ΓÇö HTTP Parameter Pollution (HPP)
+============================================================
+
+============================================================
+  TEST #10 ΓÇö Prepared Statement Injection Resistance
+============================================================
+
+============================================================
+  SECURITY TEST REPORT
+============================================================
+[PASS]  X-Powered-By header is hidden
+[PASS]  X-Content-Type-Options set to nosniff
+[PASS]  X-Frame-Options prevents clickjacking
+[PASS]  Access-Control-Allow-Credentials header present
+[PASS]  Normal-size JSON payload accepted
+[FAIL]  SQL-injected table name is rejected / sanitized (non-500)
+     Got:      500
+     Expected: 200 or 404 (safe response)
+[FAIL]  Response does not confirm injection success
+     Got:      500
+     Expected: Clean/sanitized response
+[PASS]  DROP TABLE is blocked (403)
+[PASS]  TRUNCATE is blocked (403)
+[PASS]  ALTER TABLE is blocked (403)
+[PASS]  GRANT is blocked (403)
+[PASS]  RENAME is blocked (403)
+[PASS]  DELETE without WHERE is blocked (403)
+[PASS]  UPDATE without WHERE is blocked (403)
+[PASS]  UPDATE WITH WHERE is allowed through (not 403)
+[PASS]  DELETE WITH WHERE is allowed through (not 403)
+[PASS]  Rate limiter triggers 429 after threshold
+[PASS]  XSS script tags are not reflected verbatim in response
+[PASS]  HPP: Duplicate query params handled (server does not crash)
+[PASS]  SQL injection string in chat message is handled safely (no crash)
+
+------------------------------------------------------------
+  Total Tests : 20
+  PASSED      : 18
+  FAILED      : 2
+  Score       : 90% -- EXCELLENT
+------------------------------------------------------------
+

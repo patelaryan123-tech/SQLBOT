@@ -124,3 +124,101 @@
 [2026-06-12T12:30:00.351Z] getTables - Current DB: railway, Tables count: 5, Tables: ["chat_history","orders","products","subscriptions","users"]
 [2026-06-13T02:32:06.944Z] getTables - Current DB: railway, Tables count: 5, Tables: ["chat_history","orders","products","subscriptions","users"]
 [2026-06-13T02:32:07.413Z] getTables - Current DB: railway, Tables count: 5, Tables: ["chat_history","orders","products","subscriptions","users"]
+[2026-06-15T05:15:49.446Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-15T05:15:49.475Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:20:35.124Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:20:35.160Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:23:12.315Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:23:12.477Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:28:57.301Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:28:57.322Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:29:14.284Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-06-17T04:29:14.322Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:41:47.138Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:41:47.180Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:48:56.075Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:48:56.096Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:18.733Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:18.777Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:30.771Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:30.798Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:36.106Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:36.138Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:48.629Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:48.651Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:59.198Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:53:59.223Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:54:40.354Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:54:40.388Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:55:01.383Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:55:01.394Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-01T04:55:07.691Z] switchDatabase - Request to switch to: moviesdb
+[2026-07-01T04:55:07.817Z] getTables - Current DB: moviesdb, Tables count: 5, Tables: ["actors","financials","languages","movie_actor","movies"]
+[2026-07-01T04:55:12.316Z] switchDatabase - Request to switch to: sqlbot_db
+[2026-07-01T04:55:12.433Z] getTables - Current DB: sqlbot_db, Tables count: 6, Tables: ["chat_history","employees","orders","products","subscriptions","users"]
+[2026-07-02T03:43:58.017Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:43:58.025Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:44:02.867Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:44:02.888Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:44:05.542Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:44:06.425Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:46:48.650Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:46:48.659Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:32.866Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:32.878Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:35.736Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:35.750Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:43.714Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:43.725Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:50.619Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:50.660Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:54.908Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:49:54.930Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:47.034Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:47.050Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:50.192Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:50.197Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:54.334Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:54.348Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:58.116Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:54:58.125Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:55:40.568Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:55:40.575Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:55:42.838Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:55:42.846Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:55:47.539Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:55:47.558Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:56:50.130Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:56:50.197Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:56:52.666Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:56:52.690Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:57:04.282Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:57:04.303Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:57:07.168Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:57:07.176Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:57:11.220Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T03:57:11.252Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:22.232Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:22.288Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:25.622Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:25.631Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:29.948Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:29.965Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:39.110Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:39.132Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:52.429Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:01:52.440Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:06:28.910Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:06:28.966Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:06:30.848Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:06:30.881Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:06:35.812Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:06:35.909Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:19:44.353Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:19:44.374Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:19:49.947Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:19:49.959Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:25:35.089Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:25:35.103Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:25:41.449Z] getTables - DB: sqlbot_db, count: 6
+[2026-07-02T04:25:41.487Z] getTables - DB: sqlbot_db, count: 6

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HiOutlineSun, HiCheckCircle, HiDocumentDuplicate, HiPaperAirplane, HiArrowPath } from 'react-icons/hi2';
-import { sendMessage, getChatHistory, clearChatHistory } from '../services/api';
+import { HiOutlineSun, HiCheckCircle, HiDocumentDuplicate, HiPaperAirplane, HiArrowPath, HiPaperClip } from 'react-icons/hi2';
+import { sendMessage, getChatHistory, clearChatHistory, uploadFile } from '../services/api';
 
 const SQLChat = ({
   messages,
@@ -8,9 +8,33 @@ const SQLChat = ({
   inputText,
   setInputText,
   loading,
-  setLoading
+  setLoading,
+  onNewChat
 }) => {
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const { data } = await uploadFile(formData);
+      if (data.success) {
+        setInputText(prev => prev + `\n\n[Uploaded Document: ${file.name}]\n${data.text}\n`);
+      }
+    } catch (err) {
+      console.error('Upload error', err);
+      setMessages(prev => [...prev, { role: 'assistant', response: 'Failed to upload and parse the document. Ensure backend route is configured properly.', error: true }]);
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = null;
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,16 +67,13 @@ const SQLChat = ({
   };
 
   const handleClear = async () => {
-    try {
-      await clearChatHistory();
-      setMessages([]);
-    } catch (err) {
-      console.error('Failed to clear history:', err);
+    if (onNewChat) {
+      onNewChat();
     }
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-[1200px] mx-auto p-6 md:p-8">
+    <div className="flex flex-col h-full w-full max-w-[1200px] mx-auto px-6 md:px-8 pt-16 pb-6 md:pb-8">
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex flex-col">
@@ -60,10 +81,10 @@ const SQLChat = ({
           <p className="text-[15px] text-slate-400 mt-1">Interact with your commerce database using natural language.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={handleClear} className="flex items-center gap-2 px-5 py-2.5 bg-transparent border border-white/[0.1] hover:bg-white/[0.05] text-white font-bold rounded-xl transition-colors text-[13px]">
+          <button onClick={handleClear} className="flex items-center gap-2 px-5 py-2.5 bg-white/[0.06] border border-white/[0.1] hover:bg-white/[0.1] text-white font-bold rounded-xl transition-colors text-[13px] whitespace-nowrap">
             + New Chat
           </button>
-          <button className="w-[42px] h-[42px] flex items-center justify-center bg-transparent border border-white/[0.1] rounded-xl text-slate-400 hover:text-white transition-colors">
+          <button className="w-[42px] h-[42px] flex-shrink-0 flex items-center justify-center bg-white/[0.06] border border-white/[0.1] rounded-xl text-slate-400 hover:text-white transition-colors">
             <HiOutlineSun size={18} />
           </button>
         </div>
@@ -107,7 +128,7 @@ const SQLChat = ({
                 
                 <div className={`flex-1 bg-[#0a0a1a] border border-white/[0.05] rounded-2xl rounded-tl-sm p-5 shadow-xl ${msg.error ? 'border-rose-500/50' : ''}`}>
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-[13px] font-bold text-white">Nexus Engine</span>
+                    <span className="text-[13px] font-bold text-white">QueryMind AI</span>
                   </div>
                   <p className="text-slate-300 text-[14px] leading-relaxed mb-4 whitespace-pre-wrap">
                     {msg.response}
@@ -186,6 +207,22 @@ const SQLChat = ({
       {/* Input Area */}
       <div className="absolute bottom-6 left-6 right-6 md:left-[18rem] md:right-8 z-20">
         <form onSubmit={handleSend} className="flex items-center gap-4 bg-[#0a0a1a]/95 backdrop-blur-xl border border-white/[0.1] rounded-[2rem] p-2 pl-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] focus-within:border-purple-500/50 transition-colors">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            style={{ display: 'none' }}
+            accept=".pdf,.doc,.docx,.txt,.csv,image/*"
+          />
+          <button 
+            type="button" 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading}
+            className="text-slate-400 hover:text-purple-400 transition-colors disabled:opacity-50"
+            title="Attach Document or Image"
+          >
+            <HiPaperClip size={20} />
+          </button>
           <input 
             type="text" 
             value={inputText}

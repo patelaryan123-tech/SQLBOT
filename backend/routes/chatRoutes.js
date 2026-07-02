@@ -1,26 +1,26 @@
-const express = require('express');
-const router = express.Router();
+const express  = require('express');
+const router   = express.Router();
+
 const chatController = require('../controllers/chatController');
 
-// Main chat endpoint - processes user messages
-router.post('/message', chatController.handleMessage);
+// Security Rule #1 — Validate Every User Input
+const { validateChatMessage, validateSQL } = require('../middleware/validators');
+// Security Rule #3 — Limit Login Attempts (chat-specific rate limit)
+const { chatLimiter } = require('../middleware/loginLimiter');
 
-// Explain a SQL query
-router.post('/explain', chatController.explainQuery);
+// Main chat endpoint — validate message AND enforce per-user chat rate limit
+router.post('/message',     chatLimiter, validateChatMessage, chatController.handleMessage);
 
-// Optimize a SQL query
-router.post('/optimize', chatController.optimizeQuery);
+// SQL operation endpoints — validate SQL body
+router.post('/explain',     validateSQL, chatController.explainQuery);
+router.post('/optimize',    validateSQL, chatController.optimizeQuery);
+router.post('/check-errors',validateSQL, chatController.checkErrors);
 
-// Check SQL for errors
-router.post('/check-errors', chatController.checkErrors);
+// Execute SQL (already has destructive-query guards in controller)
+router.post('/execute',     validateSQL, chatController.executeQuery);
 
-// Execute a SQL query
-router.post('/execute', chatController.executeQuery);
-
-// Get chat history (in-memory for now)
-router.get('/history', chatController.getHistory);
-
-// Clear chat history
+// Chat history
+router.get('/history',  chatController.getHistory);
 router.delete('/history', chatController.clearHistory);
 
 module.exports = router;

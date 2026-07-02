@@ -56,7 +56,7 @@ const SettingsDashboard = ({
 
   // --- Profile States ---
   const [profileName, setProfileName] = useState(profile?.name || 'Alex Mercer');
-  const [profileEmail, setProfileEmail] = useState(profile?.email || 'alex.mercer@nexus.io');
+  const [profileEmail, setProfileEmail] = useState(profile?.email || 'alex.mercer@querymind.ai');
   const [profileRole, setProfileRole] = useState(profile?.role || 'Data Engineer');
   const [profileBio, setProfileBio] = useState(profile?.bio || 'Data enthusiast, database administrator and AI explorer. Designing smart solutions.');
   const [profileAvatar, setProfileAvatar] = useState(profile?.avatar || 'https://ui-avatars.com/api/?name=Alex+Mercer&background=a855f7&color=fff');
@@ -67,7 +67,7 @@ const SettingsDashboard = ({
   useEffect(() => {
     if (profile) {
       setProfileName(profile.name || 'Alex Mercer');
-      setProfileEmail(profile.email || 'alex.mercer@nexus.io');
+      setProfileEmail(profile.email || 'alex.mercer@querymind.ai');
       setProfileRole(profile.role || 'Data Engineer');
       setProfileBio(profile.bio || 'Data enthusiast, database administrator and AI explorer. Designing smart solutions.');
       setProfileAvatar(profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'Alex Mercer')}&background=a855f7&color=fff`);
@@ -159,8 +159,8 @@ const SettingsDashboard = ({
 
   // --- Database Connections States ---
   const [connections, setConnections] = useState([
-    { id: 1, name: 'Primary PostgreSQL (Production)', type: 'PostgreSQL', host: 'postgres.nexus.io', port: 5432, dbname: 'commerce_prod', status: 'Connected' },
-    { id: 2, name: 'Analytic Snowflake (Staging)', type: 'Snowflake', host: 'sf-staging.nexus.io', port: 443, dbname: 'analytics_db', status: 'Connected' }
+    { id: 1, name: 'Primary PostgreSQL (Production)', type: 'PostgreSQL', host: 'postgres.querymind.ai', port: 5432, dbname: 'commerce_prod', status: 'Connected' },
+    { id: 2, name: 'Analytic Snowflake (Staging)', type: 'Snowflake', host: 'sf-staging.querymind.ai', port: 443, dbname: 'analytics_db', status: 'Connected' }
   ]);
   const [newConnName, setNewConnName] = useState('');
   const [newConnType, setNewConnType] = useState('PostgreSQL');
@@ -261,6 +261,7 @@ const SettingsDashboard = ({
   };
 
   // --- API Keys States ---
+  const [apiKeys, setApiKeys] = useState([
     { id: 1, name: 'Production LLM Key', key: 'nx_live_6f9e2d5a8b7c3d1e9f0a', created: '2026-04-15', lastUsed: '5 mins ago' },
     { id: 2, name: 'Staging Integration Key', key: 'nx_live_1a2b3c4d5e6f7g8h9i0j', created: '2026-05-10', lastUsed: '2 hours ago' }
   ]);
@@ -925,6 +926,7 @@ const SettingsDashboard = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.02]">
+                {apiKeys.map((key) => (
                   <tr key={key.id} className="hover:bg-white/[0.01]">
                     <td className="py-4 pl-2 font-bold text-white">{key.name}</td>
                     <td className="py-4 font-mono text-[12px] text-slate-400">{key.key}</td>

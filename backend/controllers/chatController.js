@@ -2,6 +2,8 @@ const { v4: uuidv4 } = require('uuid');
 const { classifyIntent, extractSQL, extractTableName } = require('../services/nlpEngine');
 const llmService = require('../services/llmService');
 const db = require('../config/database');
+// Security Rule #5 — Hide Authentication Details: scrub sensitive data from errors
+const { scrubSensitive } = require('../middleware/errorHandler');
 
 // Rule-based high-fidelity fallback responses when LLM is offline
 const SQL_KNOWLEDGE_BASE = {
@@ -249,11 +251,15 @@ function getFallbackResponse(intent, message) {
 /**
  * Main message handler — classifies intent and routes to appropriate service.
  */
-async function handleMessage(req, res) {
+async function handleMessage(req, res, next) {
   try {
     const { message } = req.body;
     if (!message || !message.trim()) {
       return res.status(400).json({ error: 'Message is required' });
+    }
+    // Rule #1: enforce max length guard (validator already checked, belt-and-braces)
+    if (message.length > 2000) {
+      return res.status(400).json({ error: 'Message exceeds maximum length of 2000 characters.' });
     }
 
     const messageId = uuidv4();
@@ -450,27 +456,28 @@ async function handleMessage(req, res) {
       console.error('❌ Failed to save chat message:', err.message);
     }
 
+    // Strip any HTML tags before echoing message back to prevent XSS reflection
+    const safeMessage = message.replace(/<[^>]*>/g, '').trim();
+
     res.json({
       id: messageId,
       timestamp,
-      userMessage: message,
+      userMessage: safeMessage,
       intent,
       intentConfidence: confidence,
       response
     });
   } catch (error) {
-    console.error('Chat error:', error);
-    res.status(500).json({
-      error: 'Failed to process message',
-      message: error.message
-    });
+    // Rule #5: never expose raw error message — pass to global error handler
+    console.error('Chat error:', scrubSensitive(error.message || ''));
+    return next(error);
   }
 }
 
 /**
  * Explain a SQL query.
  */
-async function explainQuery(req, res) {
+async function explainQuery(req, res, next) {
   try {
     const { sql } = req.body;
     if (!sql) return res.status(400).json({ error: 'SQL query is required' });
@@ -478,14 +485,14 @@ async function explainQuery(req, res) {
     const result = await llmService.explainSQL(sql);
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error); // Rule #5: global handler scrubs and responds safely
   }
 }
 
 /**
  * Optimize a SQL query.
  */
-async function optimizeQuery(req, res) {
+async function optimizeQuery(req, res, next) {
   try {
     const { sql } = req.body;
     if (!sql) return res.status(400).json({ error: 'SQL query is required' });
@@ -494,14 +501,14 @@ async function optimizeQuery(req, res) {
     const result = await llmService.optimizeSQL(sql, schemaContext);
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error); // Rule #5
   }
 }
 
 /**
  * Check SQL for errors.
  */
-async function checkErrors(req, res) {
+async function checkErrors(req, res, next) {
   try {
     const { sql } = req.body;
     if (!sql) return res.status(400).json({ error: 'SQL query is required' });
@@ -509,7 +516,7 @@ async function checkErrors(req, res) {
     const result = await llmService.detectErrors(sql);
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error); // Rule #5
   }
 }
 
@@ -522,10 +529,17 @@ async function executeQuery(req, res) {
     if (!sql) return res.status(400).json({ error: 'SQL query is required' });
 
     // Safety: block destructive queries
-    const destructive = /^\s*(DROP\s+DATABASE|TRUNCATE|DROP\s+TABLE)/i;
+    const destructive = /^\s*(DROP|TRUNCATE|ALTER|GRANT|REVOKE|FLUSH|KILL|RENAME)/i;
     if (destructive.test(sql)) {
       return res.status(403).json({
-        error: 'Destructive queries (DROP DATABASE, TRUNCATE) are blocked for safety.'
+        error: 'Destructive queries (DROP, TRUNCATE, ALTER, etc.) are blocked for safety.'
+      });
+    }
+
+    // Safety: prevent DELETE / UPDATE without WHERE clause
+    if (/^\s*(DELETE|UPDATE)/i.test(sql) && !/WHERE/i.test(sql)) {
+      return res.status(403).json({
+        error: 'UPDATE and DELETE queries must include a WHERE clause to prevent accidental mass data loss.'
       });
     }
 
@@ -545,9 +559,11 @@ async function executeQuery(req, res) {
       isModification
     });
   } catch (error) {
+    // Rule #5: scrub any DB credential/path that could leak in error.message
     res.status(400).json({
       success: false,
-      error: error.message,
+      error: scrubSensitive(error.message || 'Query execution failed'),
+      // sqlState and errno are safe (protocol codes, not credentials)
       sqlState: error.sqlState,
       errno: error.errno
     });
@@ -557,24 +573,24 @@ async function executeQuery(req, res) {
 /**
  * Get chat history (Database persistent per user).
  */
-async function getHistory(req, res) {
+async function getHistory(req, res, next) {
   try {
     const history = await db.getPersistentHistory(req.user.uid);
     res.json({ history });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error); // Rule #5
   }
 }
 
 /**
  * Clear chat history (Database persistent per user).
  */
-async function clearHistory(req, res) {
+async function clearHistory(req, res, next) {
   try {
     await db.clearPersistentHistory(req.user.uid);
     res.json({ message: 'Chat history cleared' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error); // Rule #5
   }
 }
 

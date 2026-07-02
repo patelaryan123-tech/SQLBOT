@@ -23,7 +23,7 @@ function AppContent() {
   // Lifted Profile State with localStorage persistence
   const [profile, setProfile] = useState(() => {
     const name = localStorage.getItem('profileName') || 'Alex Mercer';
-    const email = localStorage.getItem('profileEmail') || 'alex.mercer@nexus.io';
+    const email = localStorage.getItem('profileEmail') || 'alex.mercer@querymind.ai';
     const role = localStorage.getItem('profileRole') || 'Data Engineer';
     const bio = localStorage.getItem('profileBio') || 'Data enthusiast, database administrator and AI explorer. Designing smart solutions.';
     const avatar = localStorage.getItem('profileAvatar') || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=a855f7&color=fff`;
@@ -70,34 +70,86 @@ function AppContent() {
   };
 
   const themeStyles = {
-    'Cyber Void': {
-      bg: 'bg-[#030308] bg-gradient-to-br from-[#0c0420] via-[#04010a] to-black',
-      gradient1: 'bg-purple-900/10',
-      gradient2: 'bg-indigo-900/10'
-    },
-    'Neon City': {
-      bg: 'bg-[#020205] bg-gradient-to-br from-[#1a022b] via-[#040822] to-[#01010a]',
-      gradient1: 'bg-fuchsia-900/15',
-      gradient2: 'bg-blue-900/15'
-    },
-    'Quantum Realm': {
-      bg: 'bg-[#000102] bg-gradient-to-br from-[#011414] via-[#010608] to-black',
-      gradient1: 'bg-cyan-900/15',
-      gradient2: 'bg-emerald-900/15'
-    },
-    'Deep Space': {
-      bg: 'bg-black bg-gradient-to-br from-[#03030c] via-[#010104] to-black',
-      gradient1: 'bg-blue-950/15',
-      gradient2: 'bg-slate-900/15'
-    }
+    'Cyber Void': { bg: 'bg-[#030308] bg-gradient-to-br from-[#0c0420] via-[#04010a] to-black', gradient1: 'bg-purple-900/10', gradient2: 'bg-indigo-900/10' },
+    'Neon City': { bg: 'bg-[#020205] bg-gradient-to-br from-[#1a022b] via-[#040822] to-[#01010a]', gradient1: 'bg-fuchsia-900/15', gradient2: 'bg-blue-900/15' },
+    'Quantum Realm': { bg: 'bg-[#000102] bg-gradient-to-br from-[#011414] via-[#010608] to-black', gradient1: 'bg-cyan-900/15', gradient2: 'bg-emerald-900/15' },
+    'Deep Space': { bg: 'bg-black bg-gradient-to-br from-[#03030c] via-[#010104] to-black', gradient1: 'bg-blue-950/15', gradient2: 'bg-slate-900/15' }
   };
-
   const currentTheme = themeStyles[activeTheme] || themeStyles['Cyber Void'];
 
-  // Lifted Chat State
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInputText, setChatInputText] = useState('');
+  // Lifted Chat State (With Sessions)
+  const generateId = () => Math.random().toString(36).substring(2, 9);
+  const [chatSessions, setChatSessions] = useState(() => {
+    const saved = localStorage.getItem('chatSessions');
+    return saved ? JSON.parse(saved) : [{ id: generateId(), title: 'New Chat', messages: [], date: new Date().toISOString() }];
+  });
+  const [activeSessionId, setActiveSessionId] = useState(() => {
+    return localStorage.getItem('activeSessionId') || chatSessions[0].id;
+  });
   const [chatLoading, setChatLoading] = useState(false);
+  const [chatInputText, setChatInputText] = useState('');
+
+  // Persist sessions
+  useEffect(() => {
+    localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+  }, [chatSessions]);
+
+  useEffect(() => {
+    localStorage.setItem('activeSessionId', activeSessionId);
+  }, [activeSessionId]);
+
+  // Derived active messages
+  const activeSession = chatSessions.find(s => s.id === activeSessionId) || chatSessions[0];
+  const chatMessages = activeSession.messages;
+
+  const setChatMessages = (newMessagesOrUpdater) => {
+    setChatSessions(prev => {
+      const updated = prev.map(session => {
+        if (session.id === activeSessionId) {
+          const newMessages = typeof newMessagesOrUpdater === 'function' ? newMessagesOrUpdater(session.messages) : newMessagesOrUpdater;
+          // Auto-generate title from first user message
+          let title = session.title;
+          if (newMessages.length >= 1 && (title === 'New Chat' || title === 'Untitled Chat')) {
+             const firstUserMsg = newMessages.find(m => m.role === 'user');
+             if (firstUserMsg) title = firstUserMsg.content.slice(0, 25) + '...';
+          }
+          return { ...session, messages: newMessages, title };
+        }
+        return session;
+      });
+      return updated;
+    });
+  };
+
+  const createNewChat = () => {
+    const newSession = {
+      id: generateId(),
+      title: 'New Chat',
+      messages: [],
+      date: new Date().toISOString()
+    };
+    setChatSessions(prev => [newSession, ...prev]);
+    setActiveSessionId(newSession.id);
+  };
+
+  const switchChat = (id) => {
+    setActiveSessionId(id);
+  };
+
+  const deleteChat = (id) => {
+    setChatSessions(prev => {
+      const filtered = prev.filter(s => s.id !== id);
+      if (filtered.length === 0) {
+        const newSession = { id: generateId(), title: 'New Chat', messages: [], date: new Date().toISOString() };
+        setActiveSessionId(newSession.id);
+        return [newSession];
+      }
+      if (activeSessionId === id) {
+        setActiveSessionId(filtered[0].id);
+      }
+      return filtered;
+    });
+  };
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -110,35 +162,8 @@ function AppContent() {
         setLlmActive(false);
       }
     };
-
-    const loadHistory = async () => {
-      try {
-        const { data } = await getChatHistory();
-        if (data.history) {
-          const mapped = [];
-          data.history.forEach(h => {
-            if (h.userMessage) {
-              mapped.push({ role: 'user', content: h.userMessage });
-            }
-            if (h.response) {
-              mapped.push({
-                role: 'assistant',
-                response: h.response.message || h.response.explanation || h.response.response || '',
-                sqlQuery: h.response.sql || h.response.sqlQuery || '',
-                queryResult: h.response.queryResult || null
-              });
-            }
-          });
-          setChatMessages(mapped);
-        }
-      } catch (err) {
-        console.error('Failed to load history:', err);
-      }
-    };
-
     checkStatus();
-    loadHistory();
-    const interval = setInterval(checkStatus, 10000); // check status every 10 seconds
+    const interval = setInterval(checkStatus, 10000); 
     return () => clearInterval(interval);
   }, []);
 
@@ -163,33 +188,127 @@ function AppContent() {
         <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] mix-blend-screen animate-pulse duration-[7000ms] transition-all duration-1000 ${currentTheme.gradient2}`} />
       </div>
 
-      {/* Unified Top-Right Status Indicators - Ultra Sleek & Compact */}
-      <div className="fixed top-5 right-6 z-50 flex items-center gap-3 bg-[#050512]/60 backdrop-blur-md border border-white/[0.04] rounded-lg px-2.5 py-1.5 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-1.5 w-1.5">
-            {llmActive && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400/80 opacity-75"></span>}
-            <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${llmActive ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+      {/* ── Status Indicators — LLM & DB ─────────────────────────────── */}
+      <div className="fixed top-4 right-5 z-50 flex items-center gap-2"
+           style={{
+             background: 'linear-gradient(135deg, rgba(10,8,28,0.85) 0%, rgba(6,4,18,0.92) 100%)',
+             backdropFilter: 'blur(16px)',
+             WebkitBackdropFilter: 'blur(16px)',
+             border: '1px solid rgba(255,255,255,0.07)',
+             borderRadius: '12px',
+             padding: '6px 14px',
+             boxShadow: '0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)'
+           }}>
+
+        {/* LLM Badge */}
+        <div className="flex items-center gap-2">
+          {/* Animated dot */}
+          <span className="relative flex h-2 w-2 flex-shrink-0">
+            {llmActive && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
+                    style={{ background: 'rgba(52,211,153,0.9)' }} />
+            )}
+            <span className="relative inline-flex h-2 w-2 rounded-full"
+                  style={{
+                    background: llmActive
+                      ? 'radial-gradient(circle, #6ee7b7 0%, #10b981 60%)'
+                      : 'radial-gradient(circle, #fca5a5 0%, #ef4444 60%)',
+                    boxShadow: llmActive
+                      ? '0 0 6px 2px rgba(16,185,129,0.55)'
+                      : '0 0 6px 2px rgba(239,68,68,0.45)'
+                  }} />
           </span>
-          <span className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">LLM</span>
-          <span className={`text-[9px] font-bold uppercase tracking-tight ${llmActive ? 'text-emerald-400' : 'text-rose-500'}`}>
-            {llmActive ? 'Active' : 'Offline'}
-          </span>
+          {/* Label + status */}
+          <div className="flex items-baseline gap-1.5">
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'rgba(148,163,184,0.75)',
+              fontFamily: "'Inter', sans-serif"
+            }}>LLM</span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              fontFamily: "'Inter', sans-serif",
+              color: llmActive ? '#34d399' : '#f87171',
+              textShadow: llmActive
+                ? '0 0 10px rgba(52,211,153,0.6)'
+                : '0 0 10px rgba(248,113,113,0.5)'
+            }}>
+              {llmActive ? 'Active' : 'Offline'}
+            </span>
+          </div>
         </div>
-        <div className="w-[1px] h-2 bg-white/[0.08]" />
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-1.5 w-1.5">
-            {dbActive && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400/80 opacity-75"></span>}
-            <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dbActive ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+
+        {/* Divider */}
+        <div style={{
+          width: '1px',
+          height: '16px',
+          background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent)'
+        }} />
+
+        {/* DB Badge */}
+        <div className="flex items-center gap-2">
+          {/* Animated dot */}
+          <span className="relative flex h-2 w-2 flex-shrink-0">
+            {dbActive && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
+                    style={{ background: 'rgba(52,211,153,0.9)' }} />
+            )}
+            <span className="relative inline-flex h-2 w-2 rounded-full"
+                  style={{
+                    background: dbActive
+                      ? 'radial-gradient(circle, #6ee7b7 0%, #10b981 60%)'
+                      : 'radial-gradient(circle, #fca5a5 0%, #ef4444 60%)',
+                    boxShadow: dbActive
+                      ? '0 0 6px 2px rgba(16,185,129,0.55)'
+                      : '0 0 6px 2px rgba(239,68,68,0.45)'
+                  }} />
           </span>
-          <span className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">DB</span>
-          <span className={`text-[9px] font-bold uppercase tracking-tight ${dbActive ? 'text-emerald-400' : 'text-rose-500'}`}>
-            {dbActive ? 'Active' : 'Offline'}
-          </span>
+          {/* Label + status */}
+          <div className="flex items-baseline gap-1.5">
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'rgba(148,163,184,0.75)',
+              fontFamily: "'Inter', sans-serif"
+            }}>DB</span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              fontFamily: "'Inter', sans-serif",
+              color: dbActive ? '#34d399' : '#f87171',
+              textShadow: dbActive
+                ? '0 0 10px rgba(52,211,153,0.6)'
+                : '0 0 10px rgba(248,113,113,0.5)'
+            }}>
+              {dbActive ? 'Active' : 'Offline'}
+            </span>
+          </div>
         </div>
+
       </div>
 
       {/* Only show sidebar when user is authenticated */}
-      {currentUser && <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} profile={profile} />}
+      {currentUser && (
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          setIsOpen={setSidebarOpen} 
+          profile={profile}
+          chatSessions={chatSessions}
+          activeSessionId={activeSessionId}
+          onSwitchChat={switchChat}
+          onDeleteChat={deleteChat}
+        />
+      )}
 
       <main className="relative z-10 flex flex-col flex-1 h-screen overflow-hidden">
         <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -205,6 +324,7 @@ function AppContent() {
                     setInputText={setChatInputText}
                     loading={chatLoading}
                     setLoading={setChatLoading}
+                    onNewChat={createNewChat}
                   />
                 </ProtectedRoute>
               } 

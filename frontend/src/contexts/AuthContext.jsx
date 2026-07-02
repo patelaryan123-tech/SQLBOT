@@ -8,23 +8,30 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   // Local-only simplified auth state
-  const [currentUser, setCurrentUser] = useState({
-    uid: 'local-user',
-    email: 'local@localhost',
-    displayName: 'Local Developer'
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('localUser');
+    return saved ? JSON.parse(saved) : null;
   });
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(true);
 
   async function signup(email, password, displayName) {
-    return { user: { uid: 'local-user' } };
+    const user = { uid: 'local-user', email, displayName };
+    setCurrentUser(user);
+    localStorage.setItem('localUser', JSON.stringify(user));
+    return { user };
   }
 
   function login(email, password) {
-    return Promise.resolve({ user: { uid: 'local-user' } });
+    const user = { uid: 'local-user', email, displayName: email.split('@')[0] };
+    setCurrentUser(user);
+    localStorage.setItem('localUser', JSON.stringify(user));
+    return Promise.resolve({ user });
   }
 
   function logout() {
+    setCurrentUser(null);
+    localStorage.removeItem('localUser');
     return Promise.resolve();
   }
 
@@ -45,7 +52,9 @@ export function AuthProvider({ children }) {
   }
 
   function updateDisplayName(name) {
-    setCurrentUser(prev => ({ ...prev, displayName: name }));
+    const updatedUser = { ...currentUser, displayName: name };
+    setCurrentUser(updatedUser);
+    localStorage.setItem('localUser', JSON.stringify(updatedUser));
     return Promise.resolve();
   }
 

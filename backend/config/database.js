@@ -71,7 +71,8 @@ async function getTables() {
  * Get table structure / schema.
  */
 async function getTableSchema(tableName) {
-  const { results } = await executeQuery(`DESCRIBE \`${tableName}\``);
+  const safeName = tableName.replace(/[^a-zA-Z0-9_]/g, '');
+  const { results } = await executeQuery(`DESCRIBE \`${safeName}\``);
   return results;
 }
 

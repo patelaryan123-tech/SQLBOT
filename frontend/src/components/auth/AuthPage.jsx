@@ -35,7 +35,7 @@ const AuthPage = () => {
             <HiCircleStack className="text-white" size={28} />
           </div>
           <h2 className="text-3xl font-extrabold text-white tracking-tight flex items-center justify-center gap-2">
-            Nexus<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">SQL</span>
+            QueryMind <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">AI</span>
             <HiSparkles className="text-purple-400" size={16} />
           </h2>
           <p className="text-[14px] text-slate-400 mt-2">Enterprise-grade AI-powered SQL Assistant</p>
