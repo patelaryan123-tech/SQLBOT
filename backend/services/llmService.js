@@ -1,58 +1,56 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant'; // Groq official stable fast model
 
 /**
  * Check if local Ollama service is available.
- * Replaces isGeminiAvailable for completely offline functionality.
+ * (Now mocked for Groq Cloud functionality).
  */
 async function isOllamaAvailable() {
-  try {
-    const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 3000 });
-    const models = response.data.models || [];
-    const hasLlama = models.some(m => m.name.includes(OLLAMA_MODEL));
-    
-    return { 
-      available: true, 
-      model: OLLAMA_MODEL,
-      installed: hasLlama
-    };
-  } catch (error) {
-    return { 
-      available: false, 
-      error: `Ollama not reachable at ${OLLAMA_BASE_URL}. Ensure Ollama is running locally.`
-    };
-  }
+  return { 
+    available: true, 
+    model: GROQ_MODEL,
+    installed: true
+  };
 }
 
 /**
- * Send a prompt to the local Ollama LLM.
- * This centralizes all AI queries for offline use.
+ * Send a prompt to the Groq Cloud LLM.
+ * This centralizes all AI queries.
  */
 async function queryLLM(prompt, systemPrompt = '', options = {}) {
   try {
-    // Ollama /api/generate combines system and user prompts into one prompt for some models,
-    // or we can use /api/chat. The user specifically requested /api/generate.
-    const fullPrompt = systemPrompt ? `System: ${systemPrompt}\n\nUser: ${prompt}` : prompt;
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error("GROQ_API_KEY environment variable is not defined.");
+    }
 
-    const response = await axios.post(`${OLLAMA_BASE_URL}/api/generate`, {
-      model: OLLAMA_MODEL,
-      prompt: fullPrompt,
-      stream: false,
-      options: {
-        temperature: options.temperature || 0.2,
-      }
-    }, { timeout: options.timeout || 120000 });
+    const messages = [];
+    if (systemPrompt) {
+      messages.push({ role: 'system', content: systemPrompt });
+    }
+    messages.push({ role: 'user', content: prompt });
+
+    const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+      model: GROQ_MODEL,
+      messages: messages,
+      temperature: options.temperature || 0.2
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: options.timeout || 60000
+    });
 
     return {
       success: true,
-      response: response.data.response,
-      model: OLLAMA_MODEL
+      response: response.data.choices[0].message.content,
+      model: GROQ_MODEL
     };
   } catch (error) {
-    console.error('Ollama query error:', error.message);
+    console.error('Groq query error:', error.response ? error.response.data : error.message);
     return {
       success: false,
       error: error.message,
