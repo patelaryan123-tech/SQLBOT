@@ -17,6 +17,7 @@ const { sanitizeInputs }         = require('./middleware/sanitize');       // Ru
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler'); // Rule #5
 
 const app  = express();
+app.set('trust proxy', 1); // આ લાઈન ઉમેરો
 const PORT = process.env.PORT || 5000;
 
 // ── Security Rule #5: Helmet sets safe HTTP headers & hides server fingerprint
