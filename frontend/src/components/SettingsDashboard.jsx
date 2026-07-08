@@ -1198,7 +1198,7 @@ const SettingsDashboard = ({
     <div className="flex flex-col h-full w-full max-w-[1400px] mx-auto p-6 md:p-8 relative">
       
       {/* Toast Notification Container */}
-      <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none max-w-sm w-full">
+      <div className="fixed top-4 right-4 left-4 sm:top-6 sm:right-6 sm:left-auto z-[9999] flex flex-col gap-3 pointer-events-none sm:max-w-sm w-auto sm:w-full">
         {toasts.map(toast => (
           <div
             key={toast.id}
