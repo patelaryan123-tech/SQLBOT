@@ -310,7 +310,7 @@ function AppContent() {
         />
       )}
 
-      <main className="relative z-10 flex flex-col flex-1 h-screen overflow-hidden">
+      <main className="relative flex flex-col flex-1 h-screen overflow-hidden">
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <Routes>
             <Route 
